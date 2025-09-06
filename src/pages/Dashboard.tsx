@@ -28,26 +28,32 @@ const Dashboard = () => {
   return (
     <div className="min-h-screen bg-gradient-secondary">
       {/* Header */}
-      <header className="bg-card border-b border-border shadow-sm">
+      <header className="bg-card border-b border-border shadow-sm sticky top-0 z-40">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <div className="flex items-center space-x-3">
-              <div className="bg-gradient-primary p-2 rounded-lg">
-                <Layers3 className="h-6 w-6 text-white" />
+          <div className="flex justify-between items-center h-14 sm:h-16">
+            <div className="flex items-center space-x-2 sm:space-x-3">
+              <div className="bg-gradient-primary p-1.5 sm:p-2 rounded-lg">
+                <Layers3 className="h-5 w-5 sm:h-6 sm:w-6 text-white" />
               </div>
-              <div>
-                <h1 className="text-xl font-bold text-foreground">SynergySphere</h1>
-                <p className="text-sm text-muted-foreground">Welcome back, {user?.name}!</p>
+              <div className="min-w-0 flex-1">
+                <h1 className="text-lg sm:text-xl font-bold text-foreground truncate">SynergySphere</h1>
+                <p className="text-xs sm:text-sm text-muted-foreground hidden xs:block">Welcome back, {user?.name}!</p>
               </div>
             </div>
-            <div className="flex items-center space-x-4">
-              <Button variant="ghost" size="sm">
+            <div className="flex items-center space-x-1 sm:space-x-2">
+              <Button variant="ghost" size="sm" className="hidden sm:flex">
                 <Settings className="h-4 w-4 mr-2" />
                 Settings
               </Button>
-              <Button variant="outline" size="sm" onClick={logout}>
+              <Button variant="ghost" size="sm" className="sm:hidden p-2">
+                <Settings className="h-4 w-4" />
+              </Button>
+              <Button variant="outline" size="sm" onClick={logout} className="hidden sm:flex">
                 <LogOut className="h-4 w-4 mr-2" />
                 Sign Out
+              </Button>
+              <Button variant="outline" size="sm" onClick={logout} className="sm:hidden p-2">
+                <LogOut className="h-4 w-4" />
               </Button>
             </div>
           </div>
@@ -170,6 +176,18 @@ const Dashboard = () => {
           )}
         </div>
       </main>
+
+      {/* Floating Action Button */}
+      <div className="fixed bottom-6 right-6 z-50">
+        <Button 
+          variant="gradient" 
+          size="icon"
+          className="h-14 w-14 rounded-full shadow-elevated hover:shadow-glow transition-all duration-300 hover:scale-110"
+          onClick={() => setIsCreateModalOpen(true)}
+        >
+          <Plus className="h-6 w-6" />
+        </Button>
+      </div>
     </div>
   );
 };
