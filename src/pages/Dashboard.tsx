@@ -5,14 +5,26 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Progress } from '@/components/ui/progress';
 import { useApp } from '@/contexts/AppContext';
 import { Plus, FolderOpen, Users, Calendar, Settings, LogOut, Layers3 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 
 const Dashboard = () => {
-  const { user, projects, logout, createProject, setCurrentProject } = useApp();
+  const { user, projects, tasks, logout, createProject, setCurrentProject } = useApp();
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [newProject, setNewProject] = useState({ name: '', description: '' });
+
+  const calculateProjectProgress = (projectId: string) => {
+    const projectTasks = tasks.filter(task => task.projectId === projectId);
+    if (projectTasks.length === 0) return 0;
+    const completedTasks = projectTasks.filter(task => task.status === 'completed');
+    return Math.round((completedTasks.length / projectTasks.length) * 100);
+  };
+
+  const getProjectTaskCount = (projectId: string) => {
+    return tasks.filter(task => task.projectId === projectId).length;
+  };
 
   const handleCreateProject = (e: React.FormEvent) => {
     e.preventDefault();
@@ -144,32 +156,54 @@ const Dashboard = () => {
                 className="hover:shadow-elevated transition-all duration-200 cursor-pointer bg-gradient-card border-0 animate-slide-up"
                 onClick={() => handleProjectClick(project)}
               >
-                <CardHeader>
-                  <CardTitle className="flex items-center justify-between">
-                    <span className="truncate">{project.name}</span>
-                    <Badge variant="secondary">Active</Badge>
-                  </CardTitle>
-                  <CardDescription className="line-clamp-2">
-                    {project.description}
-                  </CardDescription>
+                <CardHeader className="pb-3">
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="flex-1 min-w-0">
+                      <CardTitle className="text-lg font-semibold text-foreground truncate mb-1">
+                        {project.name}
+                      </CardTitle>
+                      <CardDescription className="text-sm text-muted-foreground line-clamp-2 leading-relaxed">
+                        {project.description}
+                      </CardDescription>
+                    </div>
+                    <Badge variant="secondary" className="shrink-0">Active</Badge>
+                  </div>
                 </CardHeader>
-                <CardContent>
-                  <div className="flex items-center justify-between text-sm text-muted-foreground">
+                <CardContent className="space-y-4">
+                  {/* Progress Section */}
+                  <div className="space-y-2">
+                    <div className="flex justify-between items-center text-sm">
+                      <span className="text-muted-foreground">Progress</span>
+                      <span className="font-medium text-foreground">{calculateProjectProgress(project.id)}%</span>
+                    </div>
+                    <Progress 
+                      value={calculateProjectProgress(project.id)} 
+                      className="h-2 bg-secondary/50"
+                    />
+                  </div>
+                  
+                  {/* Project Stats */}
+                  <div className="flex items-center justify-between text-sm text-muted-foreground pt-1">
                     <div className="flex items-center">
-                      <Users className="h-4 w-4 mr-1" />
-                      {project.memberCount} members
+                      <Users className="h-4 w-4 mr-1.5" />
+                      <span>{project.memberCount} members</span>
                     </div>
                     <div className="flex items-center">
-                      <Calendar className="h-4 w-4 mr-1" />
-                      {new Date(project.createdAt).toLocaleDateString()}
+                      <Calendar className="h-4 w-4 mr-1.5" />
+                      <span>{new Date(project.createdAt).toLocaleDateString()}</span>
                     </div>
                   </div>
-                  <div className="mt-4">
-                    <Button variant="outline" className="w-full">
-                      <FolderOpen className="h-4 w-4 mr-2" />
-                      View Project
-                    </Button>
+                  
+                  {/* Task Count */}
+                  <div className="text-sm text-muted-foreground">
+                    <span className="font-medium text-foreground">{getProjectTaskCount(project.id)}</span> tasks total
                   </div>
+                  
+                  {/* Action Button */}
+                  <Button variant="outline" className="w-full mt-4">
+                    <FolderOpen className="h-4 w-4 mr-2" />
+                    View Project
+                  </Button>
                 </CardContent>
               </Card>
             ))
